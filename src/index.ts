@@ -8,25 +8,25 @@ const app = express();
 
 const port = Number(process.env.PORT || 8080);
 
-if (process.env.REDISTOGO_URL) {
-  var rtg = require('url').parse(process.env.REDISTOGO_URL);
-  var redis = require('redis').createClient(rtg.port, rtg.hostname);
+// if (process.env.REDISTOGO_URL) {
+//   var rtg = require('url').parse(process.env.REDISTOGO_URL);
+//   var redis = require('redis').createClient(rtg.port, rtg.hostname);
 
-  redis.auth(rtg.auth.split(':')[1]);
-} else {
-  var redis = require('redis').createClient();
-}
+//   redis.auth(rtg.auth.split(':')[1]);
+// } else {
+//   var redis = require('redis').createClient();
+// }
 
-const limiter = require('express-limiter')(app, redis);
+// const limiter = require('express-limiter')(app, redis);
 
-limiter({
-  path: '/v2',
-  method: 'get',
-  lookup: ['connection.remoteAddress'],
-  // 300 requests per minute
-  total: 300,
-  expire: 1000 * 60,
-});
+// limiter({
+//   path: '/v2',
+//   method: 'get',
+//   lookup: ['connection.remoteAddress'],
+//   // 300 requests per minute
+//   total: 300,
+//   expire: 1000 * 60,
+// });
 
 const sendResponse = (res: Response, output: APIOutput | null) => {
   if (!output) {
@@ -71,7 +71,7 @@ app.get('/v2', async (req, res) => {
     url = url.indexOf('://') === -1 ? 'http://' + url : url;
 
     const isUrlValid =
-      /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi.test(
+      /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}(\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)|(\d{1,4}\.){3}\d{1,4})/gi.test(
         url
       );
 
@@ -106,13 +106,13 @@ app.get('/v2', async (req, res) => {
       let image = og.image
         ? og.image
         : images.length > 0
-        ? images[0].src
-        : null;
+          ? images[0].src
+          : null;
       const description = og.description
         ? og.description
         : meta.description
-        ? meta.description
-        : null;
+          ? meta.description
+          : null;
       const title = (og.title ? og.title : meta.title) || '';
       const siteName = og.site_name || '';
 
